@@ -325,6 +325,29 @@ describe('configureHook()', function () {
         done();
     });
 
+    it('will preserve whitespace in the package.json', function (done) {
+
+        Utils.configureHook('pre-commit', 'test', false, Path.join(internals.fixturePath, 'project7'));
+        var fixturePackageOne = Fs.readFileSync(Path.join(internals.fixturePath, 'project7', 'package.json'), { encoding: 'utf8' });
+        expect(fixturePackageOne.charAt(0)).to.not.equal('{');
+        expect(fixturePackageOne.charAt(0)).to.equal(' ');
+        expect(fixturePackageOne.charAt(fixturePackageOne.length - 1)).to.equal('\n');
+
+        Utils.configureHook('pre-commit', 'lint', true, Path.join(internals.fixturePath, 'project7'));
+        var fixturePackageTwo = Fs.readFileSync(Path.join(internals.fixturePath, 'project7', 'package.json'), { encoding: 'utf8' });
+        expect(fixturePackageTwo.charAt(0)).to.not.equal('{');
+        expect(fixturePackageTwo.charAt(0)).to.equal(' ');
+        expect(fixturePackageTwo.charAt(fixturePackageTwo.length - 1)).to.equal('\n');
+
+        Utils.configureHook('pre-commit', 'validate', 'merge', Path.join(internals.fixturePath, 'project7'));
+        var fixturePackageThree = Fs.readFileSync(Path.join(internals.fixturePath, 'project7', 'package.json'), { encoding: 'utf8' });
+        expect(fixturePackageThree.charAt(0)).to.not.equal('{');
+        expect(fixturePackageThree.charAt(0)).to.equal(' ');
+        expect(fixturePackageThree.charAt(fixturePackageThree.length - 1)).to.equal('\n');
+
+        done();
+    });
+
     afterEach(internals.cleanupFixture);
 });
 
@@ -378,11 +401,10 @@ describe('installScript()', function () {
         done();
     });
 
-    it('preserves whitespace in the package.json', function (done) {
+    it('will preserve whitespace in the package.json', function (done) {
 
-        Utils.configureHook('pre-commit', 'test', Path.join(internals.fixturePath, 'project7'));
+        Utils.installScript('test', 'lab -a code -L', {}, Path.join(internals.fixturePath, 'project7'));
         var fixturePackage = Fs.readFileSync(Path.join(internals.fixturePath, 'project7', 'package.json'), { encoding: 'utf8' });
-
         expect(fixturePackage.charAt(0)).to.not.equal('{');
         expect(fixturePackage.charAt(0)).to.equal(' ');
         expect(fixturePackage.charAt(fixturePackage.length - 1)).to.equal('\n');
